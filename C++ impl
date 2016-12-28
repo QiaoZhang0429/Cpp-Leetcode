@@ -1,0 +1,60 @@
+set
+	RB tree
+	insert/find/delete: O(logn)
+
+map
+	RB tree sorted by key
+	insert/find/delete: O(logn)
+
+vector
+	dynamic array
+	consecutive memory on heap
+	have reserved memory - not released if size decrease
+	good for random access [] - find O(1)
+	good for push_back/pop_back - O(1)
+	bad for insert/delete in middle - copy O(n)
+	running out of memory - allocate new larger space and copy the old over to the new - slow
+	do not store object in vector, store their pointers! - construct and deconstruct upon move
+	capacity() >= size()
+	capacity usually power of 2
+
+string
+	char array
+	object - 32 bytes
+	[0:7]
+	00 00 00 00 cc cc cc cc 
+	[8:23] -- < 15 char content directly otherwise address
+	31 32 33 34 00 cc cc cc cc cc cc cc cc cc cc cc
+	c0 87 5c 00 cc cc cc cc cc cc cc cc cc cc cc cc   -- char *
+	[24:27] - number of char not including ending '\0'
+	11 00 00 00 
+	[28:31]
+	0f 00 00 00
+	+ - O(n) allocate new space and copy & concatenate
+	= - O(n) allocate new, copy over
+	== - O(n) compare length and elementwise	
+	insert() - O(n) release old space, allocate new, copy & insert & copy
+	erase() - O(n) move, release traling space
+	push_back/pop_back - O(1)
+	append - call push_back multiple times
+	+= - push_back/append
+	[] - O(1)
+	n - resulting string
+	running out of memory - allocate new larger space and copy the old over to the new - slow
+
+list
+	no reserved memory
+	no need to move elements - no construct/deconstruct, good for object storage
+	find - O(n)
+	insert/delete - O(1)
+
+deque
+	stored in block on many heaps, connected by pointers
+	1 block = n elements
+	have reserved memory
+	[] - O(n) heap jump
+	push_back/pop_back - O(1) 
+	push_front/pop_front - O(1)
+	running out of memory - allocate new block, connect with pointer, no need to copy
+	rarely need to copy and move elements - better performance
+	not consecutive memory - larger max size

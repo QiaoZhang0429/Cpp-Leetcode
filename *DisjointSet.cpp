@@ -85,12 +85,21 @@ public:
 		dSet[root1] = root2;
 	}
 	void find(int a){//O(logn)
+		int cur = a;
+        while(cur != dSet[cur])
+            cur = dSet[cur];
+        int root = cur;
+        cur = a;
+        while(cur != root)
+            dSet[cur] = root;
+		/*
 		while(dSet[a] != a){
 			int tmp = dSet[a];
 			dSet[a] = dSet[dSet[a]];
 			a = tmp;
 		}
-		return a;
+		*/
+		return root;
 	}
 	int getCount(){
 		int count = 0;

@@ -14,6 +14,23 @@ public:
 		}
 	}
 
+    ListNode* insertionSortList(ListNode* head) {
+        if(!head || !head->next)
+            return head;
+        ListNode* dummy = new ListNode(INT_MIN);
+        ListNode* cur = head;
+        while(cur){
+            ListNode* next = cur->next;
+            ListNode* ins = dummy;
+            while(ins->next && ins->next->val <= cur->val)
+                ins = ins->next;
+            cur->next = ins->next;
+            ins->next = cur;
+            cur = next;
+        }
+        return dummy->next;
+    }
+
 	//decreasing increment factor
 	//complexity hard to say
 	void shellSort(vector<int>& nums){
@@ -54,7 +71,7 @@ public:
 
 	//O(nlogn)
 	void heapSort(vector<int>& nums){
-		priority_queue<int, vector<int>, less<int>> pq;
+		priority_queue<int, vector<int>, greater<int>> pq;
 		for(auto n:nums)
 			pq.push(n);
 		int i = 0;
@@ -138,6 +155,22 @@ public:
 	  	swap(nums[i], nums[end]);	  
 	    return i;   
 	}
+	int partition(vector<int>& nums, int start, int end){
+		int l = start, r = end;
+		int pivot = nums[start + (end-start) / 2];
+		while(l <= r){
+			while(nums[l] < pivot)
+				l++;
+			while(nums[r] > pivot)
+				r--;
+			if(l <= r){
+				swap(nums[l], nums[r]);
+				l++;
+				r--;
+			}
+		}
+		return r;
+	}
 
 	//O(nlogn)
 	void mergeSort(vector<int>& nums, int start, int end){
@@ -161,6 +194,41 @@ public:
 			nums[k] = aux[k];
 	}
 
+	ListNode* sortList(ListNode* head) {
+        if(!head || !head->next)
+            return head;
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while(fast && fast->next && fast->next->next){
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        ListNode* l1 = sortList(slow->next);
+        slow->next = NULL;
+        ListNode* l2 = sortList(head);
+        return merge(l1, l2);
+    }
+    ListNode* merge(ListNode* l1, ListNode* l2){
+        ListNode* dummy = new ListNode(0);
+        ListNode* cur = dummy;
+        while(l1 && l2){
+            if(l1->val < l2->val){
+                cur->next = l1;
+                l1 = l1->next;
+            }
+            else{
+                cur->next = l2;
+                l2 = l2->next;
+            }
+            cur = cur->next;
+        }
+        if(l1)
+            cur->next = l1;
+        if(l2)
+            cur->next = l2;
+        return dummy->next;
+    }
+
 	//O(n+nlogn-nlogm)
 	void radixSort(vector<int>& nums){
 		for(auto n:nums)
@@ -171,3 +239,45 @@ public:
 };
 
 //http://blog.csdn.net/hguisu/article/details/7776068
+
+// sort algorithm example
+#include <iostream>     // std::cout
+#include <algorithm>    // std::sort
+#include <vector>       // std::vector
+
+bool myfunction (int i,int j) { return (i<j); }
+
+struct myclass {
+  bool operator() (int i,int j) { return (i<j);}
+} myobject;
+
+int main () {
+  int myints[] = {32,71,12,45,26,80,53,33};
+  std::vector<int> myvector (myints, myints+8);               // 32 71 12 45 26 80 53 33
+
+  // using default comparison (operator <):
+  // True : normal order ij, False : inverse order ji
+  std::sort (myvector.begin(), myvector.begin()+4);           //(12 32 45 71)26 80 53 33
+
+  // using function as comp
+  std::sort (myvector.begin()+4, myvector.end(), myfunction); // 12 32 45 71(26 33 53 80)
+
+  // using object as comp
+  std::sort (myvector.begin(), myvector.end(), myobject);     //(12 26 32 33 45 53 71 80)
+
+  // using lambda expression as comp
+  std::sort(intervals.begin(), intervals.end(), [](Interval& a, Interval& b){ return a.start < b.start; });
+
+  sort(citations.begin(), citations.end(), greater<int>());//decreasing order
+  sort(citations.begin(), citations.end(), less<int>());//increasing order
+
+  // print out content:
+  std::cout << "myvector contains:";
+  for (std::vector<int>::iterator it=myvector.begin(); it!=myvector.end(); ++it)
+    std::cout << ' ' << *it;
+  std::cout << '\n';
+
+  return 0;
+}
+
+//True : normal order ij, False : inverse order ji

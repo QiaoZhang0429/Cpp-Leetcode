@@ -36,57 +36,66 @@ Challenge:
 
 Can you do it in time complexity O(k log mn), where k is the length of the positions?
 */
-class UnionFind{
+class DisjointSet{
 private:
-	vector<int> dSet;
-	int count;
-	int m, n;
+    vector<int> a;
+    int count;
 public:
-	UnionFind(int m, int n) : m(m), n(n){
-		dSet.resize(m * n, -1);
-		count = 0;
-	}
-	void addPosition(int i, int j){
-		dSet[i*n+j] = i*n+j;
-		count++;
-	}
-	void union(int a, int b){
-		int root1 = find(a);
-		int root2 = find(b);
-		if(root1 == -1 || root2 == -1)
-			return ;
-		if(root1 == root2)
-			return ;
-		for(int i = 0; i < dSet.size(); i++){
-			if(dSet[i] == root2)
-				dSet[i] = root1;
-		}
-		count--;
-	}
-	void find(int a){
-		return dSet[a];
-	}
-	int getCount()
-		return count;
+    DisjointSet(int n){
+        for(int i = 0; i < n; i++)
+            a.push_back(-1);
+        count = 0;
+    }
+    void _insert(int x){
+        a[x] = x;
+        count++;
+    }
+    bool _union(int x, int y){
+        if(a[y] == -1)
+            return false;
+        int root1 = _find(x);
+        int root2 = _find(y);
+        if(root1 == root2)
+            return false;
+        a[root1] = root2;
+        count--;
+        return true;
+    }
+    int _find(int x){
+        int cur = x;
+        while(cur != a[cur])
+            cur = a[cur];
+        int root = cur;
+        cur = x;
+        while(cur != a[cur]){
+            int tmp = a[cur];
+            a[cur] = root;
+            cur = tmp;
+        }
+        return root;
+    }
+    int _getCount(){
+        return count;
+    }
 };
 class Solution {
-private:
-	vector<pair<int, int>> dist{{1,0}, {-1,0}, {0,1}, {0,-1}};
 public:
     vector<int> numIslands2(int m, int n, vector<pair<int, int>>& positions) {
-    	vector<int> rslt;
-    	UnionFind uf(m, n);
-    	for(auto p:positions){
-    		uf.addPosition(p.first, p.second);
-    		for(auto d:dist){
-    			int x = p.first + d.first;
-    			int y = p.second + d.second;
-    			if(x < 0 || x >= m || y < 0 || y >= n)
-    				continue;
-    			uf.union(p.first*n+p.second, x*n+y);
-    		}
-    		rslt.push_back(uf.getCount());
-    	}
-    	return rslt;
+        vector<int> rslt;
+        vector<pair<int, int>> neighbor = {{0,1}, {0,-1}, {1,0}, {-1,0}};
+        DisjointSet ds(m*n);
+        int numIslands = 0;
+        for(auto p:positions){
+            ds._insert(p.first*n+p.second);
+            for(auto e:neighbor){
+                int x = p.first + e.first;
+                int y = p.second + e.second;
+                if(x < 0 || x >= m || y < 0 || y >= n)
+                    continue;
+                ds._union(p.first*n+p.second, x*n+y);
+            }
+            rslt.push_back(ds._getCount());
+        }
+        return rslt;
     }
 };

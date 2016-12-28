@@ -89,37 +89,51 @@ public:
 		}
 	}
 };
-class NumMatrix{
+class NumMatrix {
 private:
-	vector<vector<int>> record;
+    vector<vector<int>> record;
 	vector<vector<int>> bit;
 public:
-	NumMatrix(vector<vector<int>>& matrix){
-		if(matrix.size() == 0)
-			return ;
-		record = matrix;
-		bit.resize(matrix.size()+1, vector<int>(matrix[0].size()+1), 0);
+    NumMatrix(vector<vector<int>> &matrix) {
+        if(matrix.size() == 0)
+            return ;
+        record.resize(matrix.size(), vector<int>(matrix[0].size(), 0));
+		bit.resize(matrix.size()+1, vector<int>(matrix[0].size()+1, 0));
 		for(int i = 0; i < matrix.size(); i++)
-			for(int j = 0; j <= matrix[0].size(); j++)
-				update(i+1, j+1, matrix[i][j]);
-	}
-	void update(int row, int col, int val){
-		int diff = val - record[row-1][col-1];
-		record[row-1][col-1] = val;
-		for(int i = row; i < bit.size(); i += i&(-i))
-			for(int j = col; j < bit[0].size(); j += j&(-j))
-				bit[i][j] += diff;
-	}
-	int sumRegion(int row1, int col1, int row2, int col2){
-		return getSum(row2+1, col2+1) - getSum(row1, col2+1) - getSum(row2+1, col1) + getSum(row1, col1); 
-	}
-	int getSum(int row, int col){
-		int sum = 0;
-		for(int i = row; i > 0; i -= i&(-i))
-			for(int j = col; j > 0; j -= j&(-j))
-				sum += bit[i][j];
-		return sum;
-	}
+			for(int j = 0; j < matrix[0].size(); j++)
+				update(i, j, matrix[i][j]);
+    }
+
+    void update(int row, int col, int val) {
+        add(row+1, col+1, val-record[row][col]);
+        record[row][col] = val;
+    }
+    
+    void add(int row, int col, int diff){
+        for(int i = row; i < bit.size(); i += lowbit(i)){
+            for(int j = col; j < bit[0].size(); j += lowbit(j)){
+                bit[i][j] += diff;
+            }
+        }
+    }
+    
+    int getSum(int row, int col){
+        int rslt = 0;
+        for(int i = row; i > 0; i -= lowbit(i)){
+            for(int j = col; j > 0; j -= lowbit(j)){
+                rslt += bit[i][j];
+            }
+        }
+        return rslt;
+    }
+
+    int sumRegion(int row1, int col1, int row2, int col2) {
+        return getSum(row2+1, col2+1) - getSum(row1, col2+1) - getSum(row2+1, col1) + getSum(row1, col1); 
+    }
+    
+    int lowbit(int pos){
+        return pos & (-pos);
+    }
 };
 // Your NumMatrix object will be instantiated and called as such:
 // NumMatrix numMatrix = new NumMatrix(matrix);
